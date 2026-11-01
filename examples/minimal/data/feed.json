@@ -1,0 +1,20 @@
+{
+  "fetchedAt": "2026-10-23 21:40",
+  "stale": true,
+  "staleSince": "2026-10-23 21:40",
+  "staleReason": "转发服务连续返 502（本机代理隧道故障，弹掉代理变量重试仍失败），已沿用上次数据",
+  "items": [
+    {"src": "热点", "tag": "行业", "at": "10-23 21:30",
+     "title": "旧数据演示：这条是 10-23 抓的，页面靠 stale 三件套告诉用户「这是旧的」",
+     "url": "https://example.com/feed/1"},
+    {"src": "热点", "tag": "行业", "at": "10-23 20:58",
+     "title": "旧数据演示：把 stale 三个字段删掉再刷新，这条告警会整条消失",
+     "url": "https://example.com/feed/2"},
+    {"src": "热点", "tag": "行业", "at": "10-23 20:31",
+     "title": "旧数据演示：不 stale 时必须不渲染，天天挂告警等于没告警",
+     "url": "https://example.com/feed/3"},
+    {"src": "热点", "tag": "行业", "at": "10-23 19:47",
+     "title": "旧数据演示：告警条里必须写清「旧到什么时候 + 为什么 + 具体修法」",
+     "url": "https://example.com/feed/4"}
+  ]
+}

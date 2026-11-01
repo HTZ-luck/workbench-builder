@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>最小示例 · 工作台搭建师</title>
+<style>
+/* ============ 主题变量（示例只做浅色；真实项目按需加 data-theme 深色切换） ============ */
+:root{
+  --bg:#f5f6f8; --card:#ffffff; --card2:#eef1f5; --line:#e2e6ec; --line2:#eaeef3;
+  --ink:#14171c; --ink2:#59616c; --ink3:#646d78;
+  --accent:#e8480f; --accent2:#ff8a66; --hot:rgba(255,92,51,.10);
+  --danger:#d92d20; --ok:#12924a; --pred:#2563eb; --warn:#b7791f;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);min-height:100vh;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:var(--pred)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+
+/* ============ 侧栏导航 ============ */
+.side{position:fixed;left:0;top:0;bottom:0;width:208px;z-index:20;
+  background:var(--card);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;padding:14px 10px;gap:2px;
+  transition:width .18s ease}
+.side .brand{display:flex;align-items:center;gap:8px;padding:2px 6px 12px;
+  font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden}
+.side .brand svg{flex:none}
+.side.collapsed{width:58px}
+.side.collapsed .brand span,.side.collapsed .nm{display:none}
+.nav{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border-radius:9px;
+  font-size:13.5px;color:var(--ink2);text-align:left;white-space:nowrap;overflow:hidden}
+.nav svg{flex:none}
+.nav:hover{background:var(--card2);color:var(--ink)}
+.nav.on{background:var(--hot);color:var(--accent);font-weight:600}
+.nav .badge{margin-left:auto;font-size:11px;background:var(--line);color:var(--ink2);
+  border-radius:8px;padding:0 6px;line-height:16px}
+.nav.on .badge{background:var(--accent);color:#fff}
+.hide{display:none!important}
+.fold{position:absolute;right:-12px;top:16px;width:24px;height:24px;border-radius:50%;
+  background:var(--card);border:1px solid var(--line);color:var(--ink3);
+  display:flex;align-items:center;justify-content:center;font-size:12px;padding:0}
+.fold:hover{color:var(--ink);border-color:var(--ink3)}
+
+/* ============ 主区 ============ */
+.wrap{margin-left:208px;padding:18px 22px 40px;min-height:100vh;transition:margin-left .18s ease}
+.side.collapsed~.wrap{margin-left:58px}
+header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+#pageTitle{font-size:19px;font-weight:700;letter-spacing:.5px}
+#status{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--ink3);margin:2px 0 16px}
+#status .st-warn{color:var(--warn);font-weight:600}
+
+/* ============ 卡片 ============ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:14px 16px;margin-bottom:14px;min-width:0}
+.card h3{margin:0 0 2px;font-size:14.5px;display:flex;align-items:center;gap:7px}
+.card .sub{color:var(--ink3);font-size:12px;margin-bottom:10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;align-items:start}
+.grid2>.card{margin-bottom:0}
+
+/* ============ 待办 ============ */
+.todo-add{display:flex;gap:8px;margin-bottom:10px}
+.ti{flex:1;min-width:0;font-size:16px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:8px;background:var(--card2);color:var(--ink);outline:none}
+.ti:focus{border-color:var(--accent)}
+.btn{font-size:13px;padding:8px 14px;border-radius:8px;background:var(--accent);color:#fff;white-space:nowrap}
+.btn.gh{background:var(--card2);color:var(--ink2);border:1px solid var(--line)}
+.btn.gh:hover{color:var(--ink)}
+.btn.dg{background:none;color:var(--ink3);border:1px solid var(--line)}
+.btn.dg:hover{color:var(--danger);border-color:var(--danger)}
+.todo{display:flex;align-items:center;gap:9px;padding:8px 4px;border-bottom:1px solid var(--line2);font-size:13.5px}
+.todo:last-child{border-bottom:none}
+.todo input[type=checkbox]{width:16px;height:16px;flex:none;accent-color:var(--accent)}
+.todo .tx{flex:1;min-width:0;overflow-wrap:anywhere}
+.todo .due{font-size:11.5px;color:var(--ink3);flex:none}
+.todo.done .tx{text-decoration:line-through;color:var(--ink3)}
+.todo.overdue .tx{color:var(--danger);font-weight:600}
+.todo.overdue .due{color:var(--danger)}
+.todo .op{font-size:11.5px;color:var(--pred);flex:none;padding:2px 6px;border-radius:6px}
+.todo .op:hover{background:var(--card2)}
+.todo .del{font-size:11.5px;color:var(--ink3);flex:none;padding:2px 6px;border-radius:6px}
+.todo .del:hover{color:var(--danger)}
+
+/* ============ 情报卡网格 ============ */
+.il-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:10px}
+.il-c{display:flex;flex-direction:column;gap:6px;padding:11px 13px;min-width:0;
+  background:var(--card);border:1px solid var(--line);border-radius:10px;cursor:default}
+.il-c:hover{border-color:var(--ink3)}
+.il-top{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink3)}
+.src-badge{font-size:11px;border-radius:5px;padding:1px 7px;font-weight:600}
+.s-星球{background:rgba(37,99,235,.12);color:var(--pred)}
+.s-热点{background:var(--hot);color:var(--accent)}
+.tag{background:var(--card2);border-radius:5px;padding:1px 7px}
+.at{margin-left:auto;white-space:nowrap}
+.il-t{font-size:13.5px;line-height:1.5;overflow-wrap:anywhere}
+.il-t:hover{text-decoration:underline}
+
+/* ============ 链接词 / 更多 ============ */
+.morelink{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:12.5px;
+  color:var(--pred);padding:5px 10px;border-radius:7px;border:1px dashed var(--line)}
+.morelink:hover{background:var(--card2);border-color:var(--pred)}
+.morelink .arw{transition:transform .15s}
+.morelink:hover .arw{transform:translateX(3px)}
+.inlink{font-size:12.5px;color:var(--pred);padding:1px 5px;border-radius:5px}
+.inlink:hover{background:var(--card2);text-decoration:underline}
+
+/* ============ 告警条（stale 三件套渲染处） ============ */
+.stalebox{border:1px solid var(--warn);border-left:3px solid var(--warn);
+  background:rgba(183,121,31,.07);border-radius:8px;padding:10px 12px;
+  font-size:12.5px;line-height:1.65;color:var(--ink)}
+.stalebox b{color:var(--warn)}
+.stalebox code{background:var(--card2);border:1px solid var(--line);border-radius:4px;
+  padding:1px 5px;font-size:11.5px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+
+/* ============ 空态 / 表格 / 档位 ============ */
+.empty{color:var(--ink3);font-size:13px;padding:18px 8px;text-align:center}
+.tbwrap{overflow-x:auto}
+table.tb{width:100%;border-collapse:collapse;font-size:12.5px;min-width:420px}
+table.tb th,table.tb td{padding:7px 9px;border-bottom:1px solid var(--line2);text-align:left;white-space:nowrap}
+table.tb th{color:var(--ink3);font-weight:600;background:var(--card2)}
+table.tb td.n{text-align:right;font-variant-numeric:tabular-nums}
+table.tb tr:last-child td{border-bottom:none}
+.tier{font-size:11px;border-radius:5px;padding:1px 7px;font-weight:600}
+.t-爆款{background:rgba(217,45,32,.12);color:var(--danger)}
+.t-常规{background:var(--card2);color:var(--ink2)}
+.t-低流量{background:rgba(18,146,74,.12);color:var(--ok)}
+.kv{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13px;margin:4px 0 2px}
+.kv b{font-size:16px;font-variant-numeric:tabular-nums}
+.kv .lab{color:var(--ink3);font-size:11.5px;display:block}
+.chartbox{overflow-x:auto}
+.chartbox svg{display:block;width:100%;min-width:460px;height:auto}
+.note{font-size:12px;color:var(--ink3);line-height:1.7;margin-top:8px}
+.note code{background:var(--card2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:11.5px}
+textarea.ti{height:96px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* ============ 响应式 ============
+   铁律：桌面端写在基类里的属性，媒体查询里没显式覆盖就会继承下来。
+   所以下面对 width / display / flex-direction 逐条显式覆盖，一条不落；
+   另外折叠状态存在 localStorage 会跨设备带到手机上，必须强制展开。 */
+@media(max-width:768px){
+  .side{position:fixed;left:0;right:0;top:auto;bottom:0;width:100%;height:auto;
+    flex-direction:row;align-items:stretch;padding:4px 4px calc(4px + env(safe-area-inset-bottom));
+    border-right:none;border-top:1px solid var(--line);gap:0}
+  .side.collapsed{width:100%}
+  .side.collapsed .brand span{display:inline}
+  .side .brand{display:none}
+  .side.collapsed .nm{display:inline}
+  .fold{display:none}
+  .nav{flex:1;width:auto;flex-direction:column;gap:2px;padding:6px 2px;
+    font-size:10.5px;text-align:center;justify-content:center;min-height:48px;border-radius:8px}
+  .nav .badge{margin-left:0;position:absolute;top:2px;right:calc(50% - 26px)}
+  .wrap{margin-left:0;padding:14px 14px calc(76px + env(safe-area-inset-bottom))}
+  .side.collapsed~.wrap{margin-left:0}
+  .grid2{grid-template-columns:1fr}
+  #pageTitle{font-size:17px}
+}
+</style>
+<!-- 铁律：数据块必须放在 </head> 之前，且在主体脚本段之外。
+     放 body 末尾 → init 立即执行时首屏三张卡全空；塞进主体脚本 → node --check 报错。
+     这三个块的内容由 scripts/inject_data.py 从 data/*.json 注入（先替换，没有才插入）。 -->
+<script id="intelData" type="application/json">{"fetchedAt": "2026-10-25 13:36", "items": [{"src": "星球", "tag": "工具", "at": "10-25 08:10", "title": "有人用 AI 把老小区改造方案做成可交互 3D，甲方当场拍板", "url": "https://example.com/intel/1"}, {"src": "星球", "tag": "变现", "at": "10-25 08:17", "title": "设计院开始收「AI 出图 + 人工改图」的打包价，单价降了三成", "url": "https://example.com/intel/2"}, {"src": "热点", "tag": "行业", "at": "10-25 09:24", "title": "多家家居品牌把软装方案页搬到线上，客户能自己换材质看效果", "url": "https://example.com/intel/3"}, {"src": "星球", "tag": "工具", "at": "10-25 09:31", "title": "一款批量去水印的工具被封了，替代方案是本地跑开源脚本", "url": "https://example.com/intel/4"}, {"src": "热点", "tag": "踩坑", "at": "10-25 10:38", "title": "AI 生成的平面图层名全是中文，导入 CAD 直接乱码", "url": "https://example.com/intel/5"}, {"src": "星球", "tag": "选题", "at": "10-25 10:45", "title": "「设计师转行做 AI 工具测评」这条赛道的商单报价涨了", "url": "https://example.com/intel/6"}]}</script>
+
+
+<script id="feedData" type="application/json">{"fetchedAt": "2026-10-23 21:40", "stale": true, "staleSince": "2026-10-23 21:40", "staleReason": "转发服务连续返 502（本机代理隧道故障，弹掉代理变量重试仍失败），已沿用上次数据", "items": [{"src": "热点", "tag": "行业", "at": "10-23 21:30", "title": "旧数据演示：这条是 10-23 抓的，页面靠 stale 三件套告诉用户「这是旧的」", "url": "https://example.com/feed/1"}, {"src": "热点", "tag": "行业", "at": "10-23 20:58", "title": "旧数据演示：把 stale 三个字段删掉再刷新，这条告警会整条消失", "url": "https://example.com/feed/2"}, {"src": "热点", "tag": "行业", "at": "10-23 20:31", "title": "旧数据演示：不 stale 时必须不渲染，天天挂告警等于没告警", "url": "https://example.com/feed/3"}, {"src": "热点", "tag": "行业", "at": "10-23 19:47", "title": "旧数据演示：告警条里必须写清「旧到什么时候 + 为什么 + 具体修法」", "url": "https://example.com/feed/4"}]}</script>
+
+
+<script id="worksData" type="application/json">{"fetchedAt": "2026-10-25 09:12", "works": [{"date": "10-18", "value": 12, "note": "状态差，只记了一条"}, {"date": "10-19", "value": 42}, {"date": "10-20", "value": 55}, {"date": "10-21", "value": 61}, {"date": "10-22", "value": 48}, {"date": "10-23", "value": 210, "note": "一条爆款：单条 200 万播放那天"}, {"date": "10-24", "value": 53}, {"date": "10-25", "value": 57}]}</script>
+
+
+</head>
+<body>
+<nav class="side" id="side">
+  <div class="brand">
+    <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewBox="0 0 24 24" width="18"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 4v5"/></svg>
+    <span>最小示例</span>
+  </div>
+  <button class="nav on" data-view="today">
+    <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewBox="0 0 24 24" width="16"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    <span class="nm">今日</span><span class="badge hide" id="bg-today">0</span>
+  </button>
+  <button class="nav" data-view="intel">
+    <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    <span class="nm">情报流</span><span class="badge hide" id="bg-intel">0</span>
+  </button>
+  <button class="nav" data-view="works">
+    <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16"><path d="M5 20V12M12 20V6M19 20v-5"/></svg>
+    <span class="nm">我的记录</span><span class="badge hide" id="bg-works">0</span>
+  </button>
+  <button class="nav" data-view="settings">
+    <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.08a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.08a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.03z"/></svg>
+    <span class="nm">设置</span>
+  </button>
+  <button class="fold" id="fold" title="折叠 / 展开">&#x2039;</button>
+</nav>
+
+<div class="wrap">
+  <header><span id="pageTitle">今日</span></header>
+  <div id="status"></div>
+  <div id="viewWrap"></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ================= 基础工具 ================= */
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function $(id){return document.getElementById(id)}
+function p2(n){return (n<10?'0':'')+n}
+function ymd(d){return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
+function hm(d){return p2(d.getHours())+':'+p2(d.getMinutes())}
+function nowStr(){return ymd(new Date())+' '+hm(new Date())}
+function mean(a){if(!a.length)return 0;var s=0;a.forEach(function(x){s+=x});return s/a.length}
+function median(a){
+  if(!a.length)return 0;
+  var s=a.slice().sort(function(x,y){return x-y}),n=s.length;
+  return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;
+}
+function r2(n){return Math.round(n*100)/100}
+
+/* ================= 数据块读取 =================
+   页面是快照不是实时：数据由本机脚本写进数据块，刷新页面不等于重新抓取。
+   块缺失 / 解析失败都要能显示出来，不许静默变空白。 */
+function block(id){
+  var el=$(id);
+  if(!el)return {missing:true,items:[],works:[],fetchedAt:''};
+  try{return JSON.parse(el.textContent||'{}')}
+  catch(e){return {broken:true,error:String(e),items:[],works:[],fetchedAt:''}}
+}
+/* 源清单与 wbconfig.py 的 SOURCES 一一对应：页面按它渲染状态行和自检计数 */
+var SRC=[
+  {key:'intel', name:'情报速览', block:'intelData', field:'items', min:1},
+  {key:'feed',  name:'行业热点', block:'feedData',  field:'items', min:0},
+  {key:'works', name:'我的记录', block:'worksData', field:'works', min:1}
+];
+function srcData(s){return block(s.block)}
+function srcItems(s){var d=srcData(s);return d[s.field]||[]}
+
+/* ================= 待办（localStorage） ================= */
+var K='wb_demo_todos';
+function seedTodos(){
+  function shift(n){var x=new Date();x.setDate(x.getDate()+n);return ymd(x)}
+  return [
+    {id:'t1',text:'把上周那条爆款拆成选题笔记',due:shift(-2),done:false},
+    {id:'t2',text:'回 3 条评论',due:shift(0),done:false},
+    {id:'t3',text:'约甲方看样板间',due:shift(1),done:false},
+    {id:'t4',text:'交了上周的周报',due:shift(-3),done:true}
+  ];
+}
+function todos(){
+  var raw=null;
+  try{raw=localStorage.getItem(K)}catch(e){}
+  if(raw!=null){
+    try{var a=JSON.parse(raw);return Array.isArray(a)?a:[]}catch(e){return []}
+  }
+  /* 首次打开铺示例数据（小台铁律：预置示例数据，别让用户头一回面对空屏幕）。
+     铺了必须马上落盘：只在内存里铺的话，第一个写操作（顺延/勾选/添加）
+     读到的还是空列表，会把种子整批冲掉——4 条变 1 条，而且不报错。 */
+  var seed=seedTodos();
+  try{
+    if(!localStorage.getItem(K+'_seeded')){
+      localStorage.setItem(K+'_seeded','1');
+      saveTodos(seed);
+      return seed;
+    }
+  }catch(e){}
+  return [];
+}
+function saveTodos(a){try{localStorage.setItem(K,JSON.stringify(a))}catch(e){}}
+
+/* ================= 视图状态 ================= */
+var state={view:'today',src:'全部'};
+try{var v0=localStorage.getItem('wb_demo_view');if(v0)state.view=v0}catch(e){}
+try{state.folded=localStorage.getItem('wb_demo_nav')==='1'}catch(e){}
+
+function gotoView(v){
+  var nav=document.querySelector('.nav[data-view="'+v+'"]');
+  if(!nav)return;
+  state.view=v;
+  try{localStorage.setItem('wb_demo_view',v)}catch(e){}
+  document.querySelectorAll('.nav').forEach(function(n){n.classList.toggle('on',n===nav)});
+  $('pageTitle').textContent=nav.querySelector('.nm').textContent;
+  refreshAll();
+}
+
+/* 卡片底部「去 XX 看全部」的统一写法：走 data-act=dxGo 页面内切视图，
+   不用 <a href>——页面内切视图不该进历史记录。 */
+function moreLink(v,label,name){
+  return '<button class="morelink" data-act="dxGo" data-v="'+esc(v)+'">'
+   + esc(label)+' · 去「'+esc(name)+'」<span class="arw">&#8594;</span></button>';
+}
+function inLink(v,text){
+  return '<button class="inlink" data-act="dxGo" data-v="'+esc(v)+'">'+esc(text)+'</button>';
+}
+
+/* ================= 渲染：状态行 ================= */
+function renderStatus(){
+  var h='';
+  SRC.forEach(function(s){
+    var d=srcData(s),items=d[s.field]||[];
+    var bad=d.broken?'数据块坏':(d.missing?'缺数据块':(d.stale?'旧':''));
+    h+='<span class="st'+(d.stale||d.broken||d.missing?' st-warn':'')+'">'
+     + esc(s.name)+' '+items.length+' 条 · '+esc(d.fetchedAt||'无数据')
+     + (bad?' · '+bad:'')+'</span>';
+  });
+  $('status').innerHTML=h;
+  var bi=$('bg-intel');
+  var n=intelAll().length;
+  bi.textContent=n;bi.classList.toggle('hide',n===0);
+  var bw=$('bg-works');
+  var nw=srcItems(SRC[2]).length;
+  bw.textContent=nw;bw.classList.toggle('hide',nw===0);
+}
+
+/* ================= 渲染：今日 ================= */
+function renderToday(){
+  var h='';
+  var t=new Date();
+  h+='<div class="grid2">';
+
+  /* 今天要处理置顶（小台铁律） */
+  h+='<div class="card"><h3>'
+   + '<svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewBox="0 0 24 24" width="15"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+   + '今天要处理</h3>'
+   + '<div class="sub">'+ymd(t).slice(5).replace('-',' 月 ')+' 日 · 存在本机浏览器，导出见'+inLink('settings','设置')+'</div>'
+   + '<div class="todo-add"><input class="ti" id="todoIn" maxlength="80" placeholder="加一条今天的待办，回车生效">'
+   + '<button class="btn" data-act="todoAdd">添加</button></div><div id="todoList"></div></div>';
+
+  /* 数据状态 */
+  h+='<div class="card"><h3>数据新鲜度</h3>'
+   + '<div class="sub">页面是快照：抓取的成败看 <code>data/last_run.json</code>，这里只看每个数据块旧不旧</div>';
+  SRC.forEach(function(s){
+    var d=srcData(s),items=d[s.field]||[];
+    var warn=d.stale||d.broken||d.missing;
+    h+='<div class="todo" style="cursor:default">'
+     + '<span class="tx" style="'+(warn?'color:var(--warn);font-weight:600':'')+'">'+esc(s.name)+' · '+items.length+' 条</span>'
+     + '<span class="due">'+esc(d.fetchedAt||'无数据')+(d.stale?' · 旧至 '+esc(d.staleSince||''):'')+'</span></div>';
+  });
+  h+='</div>';
+  h+='</div>';
+
+  /* stale 汇总告警：每个消费该数据的视图都要有，且不 stale 时必须不渲染 */
+  var stales=SRC.filter(function(s){return srcData(s).stale});
+  if(stales.length){
+    h+='<div class="stalebox" style="margin-bottom:14px"><b>有 '+stales.length+' 路数据是旧的。</b> ';
+    stales.forEach(function(s){
+      var d=srcData(s);
+      h+=esc(s.name)+'：旧到 <b>'+esc(d.staleSince||d.fetchedAt||'上次')+'</b>，原因：'
+       + esc(d.staleReason||'脚本没记录原因')+'。 ';
+    });
+    h+='修法：本机跑对应的抓取脚本（配置见 <code>wbconfig.py</code> 的 <code>cmds</code>）再跑 '
+     + '<code>inject_data.py</code>；该路没有脚本时，手动更新 <code>data/*.json</code> 后同样跑注入。'
+     + '想看成不渲染告警长什么样，把 <code>data/feed.json</code> 里 stale 三个字段删掉再注入即可。</div>';
+  }
+
+  /* 情报速览 + 我的记录 摘要 */
+  h+='<div class="grid2">';
+  var all=intelAll();
+  h+='<div class="card"><h3>最新情报</h3><div class="sub">按时间倒序前 3 条，来源见角标</div>';
+  if(!all.length){
+    h+='<div class="empty">还没有情报。页面里没有数据块时也是这个画法——给一句「去哪修」，不留白屏。</div>';
+  }else{
+    all.slice(0,3).forEach(function(x){h+=intelRow(x)});
+  }
+  h+=moreLink('intel','全部 '+all.length+' 条','情报流')+'</div>';
+
+  var ws=srcItems(SRC[2]);
+  h+='<div class="card"><h3>记录概览</h3><div class="sub">一条爆款就能把均值拉飞，所以这里中位和均值并排放</div>';
+  if(ws.length){
+    var vals=ws.map(function(x){return +x.value||0});
+    var mn=r2(mean(vals)),md=median(vals);
+    h+='<div class="kv"><span><span class="lab">中位（分档按它）</span><b>'+md+'</b></span>'
+     + '<span><span class="lab">均值（被爆款抬高的那个）</span><b>'+mn+'</b></span>'
+     + '<span><span class="lab">记录条数</span><b>'+ws.length+'</b></span></div>';
+    if(md>0&&mn>md){
+      h+='<div class="note">均值比中位高 '+Math.round((mn/md-1)*100)+'%——这就是一条 210 把头尾差距拉开了。'
+       + '分档、排序都用中位，均值只做参考。</div>';
+    }
+  }else{
+    h+='<div class="empty">还没有记录。</div>';
+  }
+  h+=moreLink('works','看分档和柱状图','我的记录')+'</div>';
+  h+='</div>';
+  return h;
+}
+function intelRow(x){
+  return '<div class="todo" style="cursor:default">'
+   + '<span class="src-badge s-'+esc(x.src)+'">'+esc(x.src)+'</span>'
+   + '<a class="tx" style="color:inherit" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+esc(x.title)+'</a>'
+   + '<span class="due">'+esc(x.at)+'</span></div>';
+}
+
+/* ================= 渲染：情报流 ================= */
+function intelAll(){
+  var out=[];
+  [SRC[0],SRC[1]].forEach(function(s){
+    srcItems(s).forEach(function(x){
+      out.push({src:x.src||s.name,tag:x.tag||'',at:x.at||'',title:x.title||'',url:x.url||'',from:s.key});
+    });
+  });
+  /* 演示数据的 at 是 "MM-DD HH:MM" 字符串，同月内倒序可用；真实项目请带可排序的时间戳字段 */
+  out.sort(function(p,q){return p.at<q.at?1:(p.at>q.at?-1:0)});
+  return out;
+}
+function renderIntel(){
+  var all=intelAll();
+  var groups=['全部'].concat(Array.from(new Set(all.map(function(x){return x.src}))));
+  var cur=state.src;
+  if(groups.indexOf(cur)<0)cur='全部';
+  var show=cur==='全部'?all:all.filter(function(x){return x.src===cur});
+  var h='';
+  /* 消费 feed 的视图，stale 必须在这里明说，不能只在总览提一句 */
+  var fd=srcData(SRC[1]);
+  if(fd.stale){
+    h+='<div class="stalebox" style="margin-bottom:12px"><b>行业热点这一路没抓到新内容。</b> '
+     + '原因：'+esc(fd.staleReason||'脚本没记录原因')+'。下面 '+((fd.items||[]).length)+' 条热点是 '
+     + '<b>'+esc(fd.staleSince||fd.fetchedAt||'上次')+'</b> 抓的，情报速览那 6 条是新的。'
+     + '修法见 '+inLink('today','今日总览')+' 的告警条。</div>';
+  }
+  h+='<div class="card"><h3>情报流</h3>'
+   + '<div class="sub">两个数据块合并：情报速览（新）+ 行业热点（演示 stale）。卡片标题是真链接，卡片本身不可点——不像链接的东西不给 pointer 手势</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">';
+  groups.forEach(function(g){
+    var n=g==='全部'?all.length:all.filter(function(x){return x.src===g}).length;
+    var on=(g===cur);
+    h+='<button class="btn'+(on?'':' gh')+'" data-act="intelSrc" data-src="'+esc(g)+'" '
+     + 'style="font-size:12px;padding:5px 12px">'+esc(g)+' '+n+'</button>';
+  });
+  h+='</div>';
+  if(!show.length){
+    h+='<div class="empty">这个筛选下没有内容。数据块缺失或为空时也是这个画法。</div>';
+  }else{
+    h+='<div class="il-g">';
+    show.forEach(function(x){
+      h+='<div class="il-c">'
+       + '<div class="il-top"><span class="src-badge s-'+esc(x.src)+'">'+esc(x.src)+'</span>'
+       + (x.tag?'<span class="tag">'+esc(x.tag)+'</span>':'')
+       + '<span class="at">'+esc(x.at)+'</span></div>'
+       + '<a class="il-t" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+esc(x.title)+'</a>'
+       + '</div>';
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+/* ================= 渲染：我的记录 ================= */
+function tierOf(v,md){
+  if(md<=0)return '常规';
+  if(v>=md*3)return '爆款';
+  if(v<md*0.5)return '低流量';
+  return '常规';
+}
+function renderWorks(){
+  var ws=srcItems(SRC[2]);
+  var h='<div class="card"><h3>我的记录</h3>'
+   + '<div class="sub">分组统计篇均和中位并列，排序分档用中位——一条爆款能把均值拉高几十倍</div>';
+  if(!ws.length){
+    return h+'<div class="empty">还没有记录。真实项目里由抓取脚本写 <code>data/works.json</code>，再跑 <code>inject_data.py</code>。</div></div>';
+  }
+  var vals=ws.map(function(x){return +x.value||0});
+  var mn=r2(mean(vals)),md=median(vals),mx=Math.max.apply(null,vals)||1;
+  var cnt={'爆款':0,'常规':0,'低流量':0};
+  ws.forEach(function(x){cnt[tierOf(+x.value||0,md)]++});
+
+  h+='<div class="kv"><span><span class="lab">中位（分档按它）</span><b>'+md+'</b></span>'
+   + '<span><span class="lab">均值（只做参考）</span><b>'+mn+'</b></span>'
+   + '<span><span class="lab">最高单条</span><b>'+mx+'</b></span></div>';
+  if(md>0){
+    h+='<div class="note">口径：<b>&#8805;3&#215;中位</b>算爆款（这条线是 '+r2(md*3)+'），'
+     + '<b>&lt;0.5&#215;中位</b>算低流量（这条线是 '+r2(md*0.5)+'），中间是常规。'
+     + '中位为 0 时全部落常规，不造规则。</div>';
+  }
+  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px">'
+   + '<span class="tier t-爆款">爆款 '+cnt['爆款']+'</span>'
+   + '<span class="tier t-常规">常规 '+cnt['常规']+'</span>'
+   + '<span class="tier t-低流量">低流量 '+cnt['低流量']+'</span></div>';
+
+  /* 手写 SVG 柱状图：红=爆款档（涨），绿=低流量档（跌），虚线=中位线 */
+  var W=560,H=200,base=160,top=14,maxh=base-top;
+  var slot=(W-20)/ws.length,bw=Math.min(40,slot-10);
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="记录柱状图">';
+  s+='<line x1="10" y1="'+base+'" x2="'+(W-10)+'" y2="'+base+'" stroke="var(--line)" stroke-width="1"/>';
+  if(md>0){
+    var my=base-md/mx*maxh;
+    s+='<line x1="10" y1="'+my+'" x2="'+(W-10)+'" y2="'+my+'" stroke="var(--warn)" stroke-width="1" stroke-dasharray="5 4"/>'
+     + '<text x="'+(W-12)+'" y="'+(my-5)+'" text-anchor="end" font-size="11" fill="var(--warn)">中位 '+md+'</text>';
+  }
+  ws.forEach(function(x,i){
+    var v=+x.value||0,t=tierOf(v,md);
+    var col=t==='爆款'?'var(--danger)':(t==='低流量'?'var(--ok)':'var(--pred)');
+    var bh=Math.max(2,v/mx*maxh);
+    var bx=10+i*slot+(slot-bw)/2,by=base-bh;
+    s+='<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" rx="3" fill="'+col+'" opacity="'+(t==='常规'?'.55':'1')+'"/>'
+     + '<text x="'+(bx+bw/2)+'" y="'+(by-5)+'" text-anchor="middle" font-size="11" fill="var(--ink2)">'+v+'</text>'
+     + '<text x="'+(bx+bw/2)+'" y="'+(base+16)+'" text-anchor="middle" font-size="11" fill="var(--ink3)">'+esc(x.date)+'</text>';
+    if(t!=='常规'){
+      s+='<text x="'+(bx+bw/2)+'" y="'+(by-19)+'" text-anchor="middle" font-size="10" fill="'+col+'">'+t+'</text>';
+    }
+  });
+  s+='</svg>';
+  h+='<div class="chartbox">'+s+'</div>';
+  h+='<div class="note">红柱=爆款档，绿柱=低流量档，蓝柱=常规；虚线是中位线。'
+   + '六个蓝柱挤在中位线上下，一根红柱冲出去——这就是「只展示两端=中间那批永远看不见」要按中位分三档的原因。</div>';
+
+  h+='<div class="tbwrap" style="margin-top:12px"><table class="tb"><thead><tr>'
+   + '<th>日期</th><th class="n" style="text-align:right">数值</th><th>档位</th><th>备注</th>'
+   + '</tr></thead><tbody>';
+  ws.forEach(function(x){
+    var v=+x.value||0,t=tierOf(v,md);
+    h+='<tr><td>'+esc(x.date)+'</td><td class="n">'+v+'</td>'
+     + '<td><span class="tier t-'+t+'">'+t+'</span></td>'
+     + '<td style="white-space:normal;min-width:160px">'+esc(x.note||'')+'</td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+  return h;
+}
+
+/* ================= 渲染：设置 ================= */
+function renderSettings(){
+  var h='<div class="card"><h3>导出 / 导入 / 清空</h3>'
+   + '<div class="sub">待办和视图偏好只存在本机浏览器；数据块内容由脚本注入，不在这里管</div>'
+   + '<div class="row" style="margin-bottom:12px">'
+   + '<button class="btn" data-act="export">导出备份</button>'
+   + '<button class="btn gh" data-act="importFile">从文件导入</button>'
+   + '<input type="file" id="impFile" accept=".json,application/json" style="display:none">'
+   + '<button class="btn dg" data-act="clear">清空本页数据</button></div>'
+   + '<textarea class="ti" id="impText" placeholder="或者把备份 JSON 粘到这里，再点「从文件导入」旁边的粘贴导入"></textarea>'
+   + '<div class="row" style="margin-top:8px"><button class="btn gh" data-act="importText">粘贴导入</button></div>'
+   + '<div class="note">导出的是一个 JSON：待办 + 当前视图 + 导出时间。导入前会弹确认，不会静默盖掉现在的待办。</div>'
+   + '</div>';
+
+  h+='<div class="card"><h3>数据块清单</h3><div class="sub">与 <code>wbconfig.py</code> 的 SOURCES 对应；自检脚本按同一张表核条数</div>'
+   + '<div class="tbwrap"><table class="tb"><thead><tr><th>数据块</th><th>字段</th><th>条数</th>'
+   + '<th>抓取时间</th><th>状态</th></tr></thead><tbody>';
+  SRC.forEach(function(s){
+    var d=srcData(s),items=d[s.field]||[];
+    var st=d.broken?'解析失败':(d.missing?'缺数据块':(d.stale?'stale（旧至 '+esc(d.staleSince||'')+'）':'正常'));
+    h+='<tr><td><code>'+esc(s.block)+'</code></td><td>'+esc(s.field)+'</td><td class="n">'+items.length+'</td>'
+     + '<td>'+esc(d.fetchedAt||'--')+'</td>'
+     + '<td'+(d.stale||d.broken||d.missing?' style="color:var(--warn);font-weight:600"':'')+'>'+st+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div class="note">退出码约定：0 正常 / 2 有警告但数据还在（沿用上次，照常发布）/ 1 真失败。'
+   + '定时任务的汇报第一句必须是 alerts，别把断更说成成功。</div></div>';
+
+  h+='<div class="card"><h3>这个示例在教什么</h3>'
+   + '<div class="note" style="margin-top:2px">'
+   + '① 数据块放 <code>&lt;/head&gt;</code> 前、主体 script 外；② stale 三件套 + 每个消费视图都渲染告警；'
+   + '③ 卡片网格 <code>minmax(0,1fr)</code> 防顶宽；④ 中位分三档 + 口径上墙；⑤ 待办过期标红 + 顺延；'
+   + '⑥ 响应式对 width/display/flex-direction 逐条显式覆盖。<br>'
+   + '完整方法论看 <code>SKILL.md</code>，怎么跑完整流程看 <code>examples/minimal/README.md</code>。</div></div>';
+  return h;
+}
+
+/* ================= 待办操作 ================= */
+function renderTodos(){
+  var el=$('todoList');
+  var bg=$('bg-today');
+  var list0=todos();
+  if(bg){
+    var n0=list0.filter(function(x){return !x.done}).length;
+    bg.textContent=n0;bg.classList.toggle('hide',n0===0);
+  }
+  if(!el)return;
+  var list=list0.slice().sort(function(a,b){
+    if(a.done!==b.done)return a.done?1:-1;
+    return a.due<b.due?-1:1;
+  });
+  if(!list.length){
+    el.innerHTML='<div class="empty">今天没有待办。上面输入框加一条。</div>';
+    return;
+  }
+  var t=ymd(new Date()),h='';
+  list.forEach(function(x){
+    var od=!x.done&&x.due<t;
+    h+='<div class="todo'+(x.done?' done':'')+(od?' overdue':'')+'">'
+     + '<input type="checkbox" data-act="todoDone" data-id="'+esc(x.id)+'"'+(x.done?' checked':'')+'>'
+     + '<span class="tx">'+esc(x.text)+'</span>'
+     + '<span class="due">'+(x.due===t?'今天':esc(x.due))+(od?' · 已过期':'')+'</span>'
+     + (od?'<button class="op" data-act="todoDelay" data-id="'+esc(x.id)+'">顺延到今天</button>':'')
+     + '<button class="del" data-act="todoDel" data-id="'+esc(x.id)+'">删</button></div>';
+  });
+  el.innerHTML=h;
+}
+
+/* ================= 导出 / 导入 / 清空 ================= */
+function exportAll(){
+  var pack={v:1,app:'wb_demo',exportedAt:nowStr(),view:state.view,todos:todos()};
+  var blob=new Blob([JSON.stringify(pack,null,1)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='wb_demo_backup.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(a.href)},3000);
+}
+function importPack(txt){
+  var p;
+  try{p=JSON.parse(txt)}catch(e){alert('不是合法的 JSON：'+e.message);return}
+  if(!p||!Array.isArray(p.todos)){alert('格式不对：缺少 todos 数组');return}
+  if(!confirm('导入会覆盖当前 '+todos().length+' 条待办，确定？'))return;
+  saveTodos(p.todos);
+  if(p.view&&document.querySelector('.nav[data-view="'+p.view+'"]'))gotoView(p.view);
+  else refreshAll();
+}
+
+/* ================= 统一渲染入口（DAG 单向调度） =================
+   所有状态变化最后都汇到这里：改数据 → 存 → refreshAll，不各画各的。
+   每个视图的根节点带 data-view-sec，回归脚本靠它断言「切对了视图」。 */
+function refreshAll(){
+  renderStatus();
+  var el=$('viewWrap');
+  var inner;
+  if(state.view==='intel')inner=renderIntel();
+  else if(state.view==='works')inner=renderWorks();
+  else if(state.view==='settings')inner=renderSettings();
+  else inner=renderToday();
+  el.innerHTML='<div data-view-sec="'+state.view+'">'+inner+'</div>';
+  if(state.view==='today')renderTodos();
+}
+
+/* ================= 事件 ================= */
+document.addEventListener('click',function(e){
+  var nav=e.target.closest('.nav');
+  if(nav){gotoView(nav.dataset.view);return;}
+  var el=e.target.closest('[data-act]');
+  if(!el)return;
+  var act=el.dataset.act,id=el.dataset.id;
+  if(act==='dxGo'){gotoView(el.dataset.v);return}
+  if(act==='todoAdd'){
+    var inp=$('todoIn'),v=(inp.value||'').trim();
+    if(!v){inp.focus();return}
+    var a=todos();
+    a.push({id:'t'+Date.now(),text:v,due:ymd(new Date()),done:false});
+    saveTodos(a);inp.value='';renderTodos();renderStatus();return;
+  }
+  if(act==='todoDone'||act==='todoDelay'||act==='todoDel'){
+    var a2=todos(),i=-1;
+    a2.forEach(function(x,k){if(x.id===id)i=k});
+    if(i<0)return;
+    if(act==='todoDone')a2[i].done=!a2[i].done;
+    else if(act==='todoDelay')a2[i].due=ymd(new Date());
+    else a2.splice(i,1);
+    saveTodos(a2);refreshAll();return;
+  }
+  if(act==='intelSrc'){state.src=el.dataset.src;refreshAll();return}
+  if(act==='export'){exportAll();return}
+  if(act==='clear'){
+    if(!confirm('清空本页存的待办和视图偏好？数据块内容不动（那些由脚本注入）。'))return;
+    /* 只删数据不删 _seeded 标记：删了标记，下一次读会把示例种子重新铺回来，
+       用户就永远清不干净 */
+    try{localStorage.removeItem(K);localStorage.removeItem('wb_demo_view')}catch(e2){}
+    state.view='today';refreshAll();return;
+  }
+  if(act==='importFile'){$('impFile').click();return}
+  if(act==='importText'){importPack($('impText').value||'');return}
+});
+/* 待办输入框只在「今日」视图里存在，文件选择框只在「设置」视图里存在——
+   都不能在 init 时直接绑定（元素还没渲染），一律走 document 委托。 */
+document.addEventListener('keydown',function(e){
+  if(e.target&&e.target.id==='todoIn'&&e.key==='Enter'){
+    var b=document.querySelector('[data-act="todoAdd"]');
+    if(b)b.click();
+  }
+});
+document.addEventListener('change',function(e){
+  var f=e.target;
+  if(!f||f.id!=='impFile'||!f.files||!f.files[0])return;
+  var r=new FileReader();
+  r.onload=function(){importPack(String(r.result||''))};
+  r.readAsText(f.files[0]);
+  f.value='';
+});
+function setFolded(on){
+  state.folded=on;
+  $('side').classList.toggle('collapsed',on);
+  try{localStorage.setItem('wb_demo_nav',on?'1':'0')}catch(e){}
+}
+$('fold').addEventListener('click',function(){setFolded(!state.folded)});
+setFolded(!!state.folded);
+
+/* 首屏：先按上次视图渲染，再校正导航高亮（localStorage 的视图可能是脏值） */
+(function init(){
+  if(!document.querySelector('.nav[data-view="'+state.view+'"]'))state.view='today';
+  document.querySelectorAll('.nav').forEach(function(n){n.classList.toggle('on',n.dataset.view===state.view)});
+  $('pageTitle').textContent=document.querySelector('.nav.on .nm').textContent;
+  refreshAll();
+})();
+})();
+</script>
+</body>
+</html>

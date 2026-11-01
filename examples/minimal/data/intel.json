@@ -1,0 +1,47 @@
+{
+ "fetchedAt": "2026-10-25 13:36",
+ "items": [
+  {
+   "src": "星球",
+   "tag": "工具",
+   "at": "10-25 08:10",
+   "title": "有人用 AI 把老小区改造方案做成可交互 3D，甲方当场拍板",
+   "url": "https://example.com/intel/1"
+  },
+  {
+   "src": "星球",
+   "tag": "变现",
+   "at": "10-25 08:17",
+   "title": "设计院开始收「AI 出图 + 人工改图」的打包价，单价降了三成",
+   "url": "https://example.com/intel/2"
+  },
+  {
+   "src": "热点",
+   "tag": "行业",
+   "at": "10-25 09:24",
+   "title": "多家家居品牌把软装方案页搬到线上，客户能自己换材质看效果",
+   "url": "https://example.com/intel/3"
+  },
+  {
+   "src": "星球",
+   "tag": "工具",
+   "at": "10-25 09:31",
+   "title": "一款批量去水印的工具被封了，替代方案是本地跑开源脚本",
+   "url": "https://example.com/intel/4"
+  },
+  {
+   "src": "热点",
+   "tag": "踩坑",
+   "at": "10-25 10:38",
+   "title": "AI 生成的平面图层名全是中文，导入 CAD 直接乱码",
+   "url": "https://example.com/intel/5"
+  },
+  {
+   "src": "星球",
+   "tag": "选题",
+   "at": "10-25 10:45",
+   "title": "「设计师转行做 AI 工具测评」这条赛道的商单报价涨了",
+   "url": "https://example.com/intel/6"
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+{
+ "ranAt": "2026-10-25 13:36",
+ "batch": "全部 3 个源",
+ "ok": true,
+ "steps": [
+  {
+   "key": "intel",
+   "name": "情报速览",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "key": "feed",
+   "name": "行业热点",
+   "ok": true,
+   "error": ""
+  },
+  {
+   "key": "works",
+   "name": "我的记录",
+   "ok": true,
+   "error": ""
+  }
+ ],
+ "alerts": [
+  {
+   "file": "feed.json",
+   "since": "2026-10-23 21:40",
+   "hours": 39,
+   "reason": "转发服务连续返 502（本机代理隧道故障，弹掉代理变量重试仍失败），已沿用上次数据",
+   "items": 4
+  }
+ ]
+}
