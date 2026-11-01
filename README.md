@@ -37,7 +37,7 @@ Windows 在 Git Bash 里执行：
 
 ```
 cd "/c/Users/你的用户名/.workbuddy/skills"
-git clone https://github.com/q631129987-hub/workbench-builder.git
+git clone https://github.com/HTZ-luck/workbench-builder.git
 ```
 
 > 克隆出的文件夹名是 `workbench-builder`，WorkBuddy 靠里面的 `SKILL.md` 识别 skill，文件夹名不影响使用，想改中文名也行。
