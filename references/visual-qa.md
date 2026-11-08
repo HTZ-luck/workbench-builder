@@ -124,9 +124,9 @@ var ms = re.findall(pattern, dom); var raw = ms[-1];  // 取最后一次出现
 
 ## 五、这条路走不通，别再花时间
 
-**像素级校验在本机架不起来**，三个死结：
+**像素级校验这条路走不通**，三个死结：
 
-- 环境里没有 PIL/Pillow，装不上
+- 运行环境里未必有 PIL/Pillow
 - 换浏览器自己解码图片，`file://` 的图必须带 `--allow-file-access-from-files`
 - 大图走 data URI，在 `virtual-time-budget` 里解码不完，`--dump-dom` 出来时是空的
 

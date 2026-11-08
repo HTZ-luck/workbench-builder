@@ -5,7 +5,7 @@
   1. 写 json 到 data/intel.json，带 fetchedAt（北京时间字符串，不是 UTC 时间戳）
   2. 抓不到就绝不覆盖——沿用上次数据，打上 stale 三件套，退出码 2
   3. 外部内容先剥 emoji 再入库，否则页面自检过不了
-  4. 弹掉所有 *roxy* 环境变量——本机代理隧道时好时坏，会让好好的接口报 502
+  4. 弹掉所有 *roxy* 环境变量——运行环境的代理隧道时好时坏，会让好好的接口报 502
   5. JSON 序列化时 </ 转义——条目文本里出现 </script> 会提前结束数据块标签
 
 用法：
@@ -70,7 +70,7 @@ def main():
     if "--fail" in sys.argv:
         return keep_prev("演示：模拟抓取失败（--fail）")
 
-    # 弹掉代理变量：本机代理隧道时好时坏，会让好好的接口报 502
+    # 弹掉代理变量：运行环境的代理隧道时好时坏，会让好好的接口报 502
     for k in list(os.environ):
         if "roxy" in k.lower():
             os.environ.pop(k)
