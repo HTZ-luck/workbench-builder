@@ -63,13 +63,15 @@ git clone https://github.com/HTZ-luck/workbench-builder.git
 ## 目录
 
 ```
-SKILL.md                     主文件：23 条铁律 + 完整流程
+SKILL.md                     主文件：23 条铁律 + 完整流程 + 搭建期 G1-G8 + 交付回对 A1-A9
 references/
   workbench-definition.md    定义层：打开时刻 / 四种写入者 / 第 40 天测试 / 遗弃黑名单
   data-contract.md           数据契约速查（页面数据块 ↔ 抓取脚本）
   visual-system.md           皮肤、主题、面板三层变量体系
   visual-qa.md               对比度 / 移动端 / 减少动态效果的验收方法
   anti-sameness.md           防重样：五轴坐标 + 用过清单
+  build-guardrails.md        搭建期护栏：DAG / 冒烟自检 / 示例数据裁决 / 移动端数值
+  delivery-audit.md          交付回对：承诺逐条核对 / 验收可信度 / 迭代配置回写
 scripts/                     模板脚本（回归 / 自检 / 注入 / 发布…）
 examples/minimal/            最小可跑骨架（含示例数据）
 LICENSE                      CC BY-NC-SA 4.0
@@ -81,7 +83,7 @@ LICENSE                      CC BY-NC-SA 4.0
 
 **CC BY-NC-SA 4.0**（署名 - 非商业性使用 - 相同方式共享），见 `LICENSE`。
 
-作者署名：正文里不含人名（触发语和示例都已脱敏），所以你可以直接拿去用，  
+正文里不含人名（触发语和示例都已脱敏），所以你可以直接拿去用，  
 不用先改掉某个陌生人的名字。
 
 **商业使用**（付费产品、企业内训、商业交付等）不在本协议自动授权范围内，  

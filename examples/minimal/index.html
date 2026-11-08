@@ -258,7 +258,7 @@ function todos(){
   if(raw!=null){
     try{var a=JSON.parse(raw);return Array.isArray(a)?a:[]}catch(e){return []}
   }
-  /* 首次打开铺示例数据（小台铁律：预置示例数据，别让用户头一回面对空屏幕）。
+  /* 首次打开铺示例数据（别让用户头一回面对空屏幕）。
      铺了必须马上落盘：只在内存里铺的话，第一个写操作（顺延/勾选/添加）
      读到的还是空列表，会把种子整批冲掉——4 条变 1 条，而且不报错。 */
   var seed=seedTodos();
@@ -323,7 +323,7 @@ function renderToday(){
   var t=new Date();
   h+='<div class="grid2">';
 
-  /* 今天要处理置顶（小台铁律） */
+  /* 今天要处理置顶 */
   h+='<div class="card"><h3>'
    + '<svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewBox="0 0 24 24" width="15"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
    + '今天要处理</h3>'
