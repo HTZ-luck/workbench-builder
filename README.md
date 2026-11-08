@@ -63,7 +63,7 @@ git clone https://github.com/HTZ-luck/workbench-builder.git
 ## 目录
 
 ```
-SKILL.md                     主文件：23 条铁律 + 完整流程 + 搭建期 G1-G8 + 交付回对 A1-A10
+SKILL.md                     主文件：23 条铁律 + 完整流程 + 搭建期 G1-G8 + 交付回对 A1-A12
 references/
   workbench-definition.md    定义层：打开时刻 / 四种写入者 / 第 40 天测试 / 遗弃黑名单
   data-contract.md           数据契约速查（页面数据块 ↔ 抓取脚本）
