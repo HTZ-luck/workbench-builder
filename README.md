@@ -63,7 +63,7 @@ git clone https://github.com/HTZ-luck/workbench-builder.git
 ## 目录
 
 ```
-SKILL.md                     主文件：23 条铁律 + 完整流程 + 搭建期 G1-G8 + 交付回对 A1-A12 + 运行期 B1-B6
+SKILL.md                     主文件：23 条铁律 + 完整流程 + 搭建期 G1-G8 + 交付回对 A1-A12 + 运行期 B1-B11
 references/
   workbench-definition.md    定义层：打开时刻 / 四种写入者 / 第 40 天测试 / 遗弃黑名单
   data-contract.md           数据契约速查（页面数据块 ↔ 抓取脚本）
@@ -72,7 +72,7 @@ references/
   anti-sameness.md           防重样：五轴坐标 + 用过清单
   build-guardrails.md        搭建期护栏：DAG / 冒烟自检 / 示例数据裁决 / 移动端数值
   delivery-audit.md          交付回对：承诺逐条核对 / 验收可信度 / 迭代配置回写
-  runtime-governance.md      运行期治理：口径唯一真源 / 历史留痕 / 低置信标注 / 分区写入 / 构建告警
+  runtime-governance.md      运行期治理：口径唯一真源 / 历史留痕 / 数据性质标注 / 时间同源 / 多主体分区 / 判定依据 / 速览与打印
 scripts/                     模板脚本（回归 / 自检 / 注入 / 发布…）
 examples/minimal/            最小可跑骨架（含示例数据）
 LICENSE                      CC BY-NC-SA 4.0
